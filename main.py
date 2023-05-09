@@ -74,10 +74,8 @@ def draw_graphics(x, y):
     bins = 1 + int(np.ceil(np.log2(len(x))))
     fig, axs = plt.subplots(1, 3)
     p1, p2, p3 = axs
-
     p1.set_title("Функция распределения")
-    p1.plot(x, y, c='r')
-    p1.fill_between(x, y, y2=0)
+    p1.step(([min(x) - 0.5] + list(x) + [max(x) + 0.5]), ([0] + y + [1]), c='r', where="post")
     p1.grid(True)
     p1.xaxis.set_ticks_position('bottom')
     p1.yaxis.set_ticks_position('left')
@@ -107,8 +105,12 @@ if __name__ == '__main__':
     print("Вариационный ряд:", sorted(numbers))
     print("Экстремальные значения:", min(numbers), "-", max(numbers))
     print("Размах выборки:", max(numbers) - min(numbers))
-    print("Матожидание:", get_math_expectation(numbers))
-    print("Среднеквадратичное отклонение:", np.sqrt(get_variance(numbers)))
+    print("Матожидание:", round(get_math_expectation(numbers), 5))
+    D = get_variance(numbers)
+    print("Дисперсия:", round(D, 5))
+    print("Исправленная дисперсия:", round(n * D / (n - 1), 5))
+    print("Среднеквадратичное отклонение:", round(np.sqrt(D), 5))
+    print("Исправленное среднеквадратичное отклонение:", round(np.sqrt(n * D / (n - 1)), 5))
     partsum = [frequency_matrix[0, 1]]
     for i in range(1, len(frequency_matrix)):
         partsum.append(round(partsum[i - 1] + frequency_matrix[i, 1], 2))
@@ -116,8 +118,11 @@ if __name__ == '__main__':
     table.add_row(partsum)
     print("Функция распределения:")
     print(table)
-    # if yes_or_no_input("Покаказать графики?"):
-    #     draw_graphics(frequency_matrix[:, 0], partsum)
+    print("F:")
+    print(f"Для x < {frequency_matrix[0][0]}: 0")
+    for i in range(0, len(partsum) - 1):
+        print(f"Для {frequency_matrix[i][0]} <= x < {frequency_matrix[i + 1][0]}: {partsum[i]}")
+    print(f"Для {frequency_matrix[-1][0]} < x: {float(1)}")
     draw_graphics(frequency_matrix[:, 0], partsum)
 
     file.close()
