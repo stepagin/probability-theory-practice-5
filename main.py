@@ -1,3 +1,4 @@
+import sys
 from collections import Counter
 
 import numpy as np
@@ -5,7 +6,7 @@ from prettytable import PrettyTable
 import matplotlib.pyplot as plt
 
 
-def get_frequency_matrix(s):
+def get_variance_matrix(s):
     """
     Возвращает таблицу частостей по выборке.
     """
@@ -13,9 +14,19 @@ def get_frequency_matrix(s):
     n = len(s)
     matrix = []
     for k, v in d.items():
-        matrix.append([k, v / n])
+        matrix.append([k, v])
     matrix.sort()
     return np.array(matrix)
+
+
+def get_frequency_matrix(s):
+    """
+    Возвращает таблицу частостей по выборке.
+    """
+    fm = get_variance_matrix(s)
+    for i in range(len(fm)):
+        fm[i][1] /= n
+    return fm
 
 
 def get_math_expectation(numbers):
@@ -72,17 +83,21 @@ def draw_graphics(x, y):
     Принимает координаты точек в виде массивов по осям абсцисс и ординат.
     """
     bins = 1 + int(np.ceil(np.log2(len(x))))
-    fig, axs = plt.subplots(1, 3)
-    p1, p2, p3 = axs
+    fig, p1 = plt.subplots(1, 1)
     p1.set_title("Функция распределения")
-    p1.step(([min(x) - 0.5] + list(x) + [max(x) + 0.5]), ([0] + y + [1]), c='r', where="post")
+    p1.step(([min(x) - 0.3] + list(x) + [max(x) + 0.3]), ([0] + y + [1]), c='r', where="post")
     p1.grid(True)
     p1.xaxis.set_ticks_position('bottom')
     p1.yaxis.set_ticks_position('left')
+    plt.show()
 
+    fig, p2 = plt.subplots(1, 1)
     p2.set_title("Гистограмма")
+    p2.grid(True)
     hist = p2.hist(x, bins)
+    plt.show()
 
+    fig, p3 = plt.subplots(1, 1)
     bars_x, bars_y = hist[1][1:], hist[0]
     p3.set_title("Полигон приведенных частот\nгруппированной выборки")
     p3.plot(bars_x, bars_y, marker='.')
@@ -101,8 +116,10 @@ if __name__ == '__main__':
         numbers = numbers[:n]
 
     frequency_matrix = get_frequency_matrix(numbers)
+    variance_matrix = get_variance_matrix(numbers)
 
     print("Вариационный ряд:", sorted(numbers))
+
     print("Экстремальные значения:", min(numbers), "-", max(numbers))
     print("Размах выборки:", max(numbers) - min(numbers))
     print("Матожидание:", round(get_math_expectation(numbers), 5))
@@ -111,6 +128,7 @@ if __name__ == '__main__':
     print("Исправленная дисперсия:", round(n * D / (n - 1), 5))
     print("Среднеквадратичное отклонение:", round(np.sqrt(D), 5))
     print("Исправленное среднеквадратичное отклонение:", round(np.sqrt(n * D / (n - 1)), 5))
+
     partsum = [frequency_matrix[0, 1]]
     for i in range(1, len(frequency_matrix)):
         partsum.append(round(partsum[i - 1] + frequency_matrix[i, 1], 2))
@@ -118,6 +136,7 @@ if __name__ == '__main__':
     table.add_row(partsum)
     print("Функция распределения:")
     print(table)
+
     print("F:")
     print(f"Для x < {frequency_matrix[0][0]}: 0")
     for i in range(0, len(partsum) - 1):
