@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def get_variance_matrix(s):
     """
-    Возвращает таблицу частостей по выборке.
+    Возвращает таблицу частот по выборке.
     """
     d = Counter(s)
     n = len(s)
@@ -111,6 +111,8 @@ if __name__ == '__main__':
     file = open(filename, "r")
     n = int(file.readline())
     numbers = [float(t) for t in file.readline().split()]
+    file.close()
+    
     if n != len(numbers):
         n = min(n, len(numbers))
         numbers = numbers[:n]
@@ -144,4 +146,3 @@ if __name__ == '__main__':
     print(f"Для {frequency_matrix[-1][0]} < x: {float(1)}")
     draw_graphics(frequency_matrix[:, 0], partsum)
 
-    file.close()
